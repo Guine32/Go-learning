@@ -4,14 +4,18 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
+
+const monitoramentos = 3
+const delay = 5
 
 func main() {
 
 	exibeIntroducao()
-	exibeMenu()
-
 	for {
+		exibeMenu()
+
 		comando := leComando()
 
 		switch comando {
@@ -47,13 +51,28 @@ func leComando() int {
 	var comandoLido int
 	fmt.Scan(&comandoLido)
 	fmt.Println("O comando escolhido foi:", comandoLido)
-
+	fmt.Println("")
 	return comandoLido
 }
 
 func iniciarMonitoramento() {
-	fmt.Println("Monitorando")
-	site := "https://random-status-code.herokuapp.com/"
+	fmt.Println("Monitorando...")
+	sites := []string{"https://httpstat.us/404", "https://www.alura.com.br", "https://www.caelum.com.br"}
+
+	for i := 0; i < monitoramentos; i++ {
+		for i, site := range sites {
+			fmt.Println("Testando site:", i, ":", site)
+			testaSite(site)
+			fmt.Println("")
+		}
+		time.Sleep(delay * time.Second)
+	}
+
+	fmt.Println("")
+
+}
+
+func testaSite(site string) {
 	resp, _ := http.Get(site)
 
 	switch resp.StatusCode {
@@ -62,4 +81,5 @@ func iniciarMonitoramento() {
 	default:
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
 	}
+
 }
